@@ -41,6 +41,11 @@ public class MemberServiceTest {
         Object objService = factory.create(jcl, "com.example.demo2.services.MemberService");
         Class<?> memberService = objService.getClass();
 
+        Method save = memberService.getMethod("save");
+        final Object result = save.invoke(memberService.getDeclaredConstructor().newInstance());
+        System.out.println(result);
+
+        /*
         Object objEntities = factory.create(jcl, "com.example.demo2.entities.Member");
         Class<?> memberEntities = objEntities.getClass();
 
@@ -57,11 +62,8 @@ public class MemberServiceTest {
         for (Method method: declaredMethods){
             System.out.println(method.getName());
         }
+        */
 
-
-        Method save = memberService.getMethod("save");
-        final Object result = save.invoke(memberService.getDeclaredConstructor().newInstance());
-        System.out.println(result);
 
 
 
