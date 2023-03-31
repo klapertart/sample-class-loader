@@ -13,6 +13,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author kurakuraninja
@@ -73,5 +76,29 @@ public class MemberServiceTest {
 //        final Object invoke = plus.invoke(aClass.getDeclaredConstructor().newInstance(),2,2);
 //        log.info("Result : {}", invoke);
 
+    }
+
+    @Test
+    public void testScanClass(){
+        //customClassLoader.loadJar();
+        JarClassLoader jcl = new JarClassLoader();
+
+        //Loading classes from different sources
+        jcl.add("demo23.jar");
+
+        Map<String, byte[]> loadedResourceMap = jcl.getLoadedResources();
+
+
+        Set<String> loadedSet= loadedResourceMap.keySet().stream()
+                .filter(s -> s.startsWith("com/example/demo2/")).collect(Collectors.toSet());
+
+        //System.out.println(loadedSet.size());
+
+        for (String localSet : loadedSet) {
+
+            String modifiedString = localSet.replace("/", ".").replace(".class", "");
+            log.info("modified string " + modifiedString);
+
+        }
     }
 }
