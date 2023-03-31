@@ -13,6 +13,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author kurakuraninja
@@ -33,7 +36,7 @@ public class MemberServiceTest {
         JarClassLoader jcl = new JarClassLoader();
 
         //Loading classes from different sources
-        jcl.add("demo2.jar");
+        jcl.add("demo23.jar");
 
         JclObjectFactory factory = JclObjectFactory.getInstance();
 
@@ -41,19 +44,29 @@ public class MemberServiceTest {
         Object objService = factory.create(jcl, "com.example.demo2.services.MemberService");
         Class<?> memberService = objService.getClass();
 
+        Method save = memberService.getMethod("save");
+        final Object result = save.invoke(memberService.getDeclaredConstructor().newInstance());
+        System.out.println(result);
+
+        /*
         Object objEntities = factory.create(jcl, "com.example.demo2.entities.Member");
         Class<?> memberEntities = objEntities.getClass();
 
         final Object memberObject = memberEntities.getDeclaredConstructor().newInstance();
         final Field fName = memberEntities.getDeclaredField("name");
+        final Field fId = memberEntities.getDeclaredField("id");
         fName.setAccessible(true);
         fName.set(memberObject,"Harun");
+        fId.setAccessible(true);
+        fId.set(memberObject,"12121212");
 
 
+        Method[] declaredMethods = memberService.getDeclaredMethods();
+        for (Method method: declaredMethods){
+            System.out.println(method.getName());
+        }
+        */
 
-
-        final Method save = memberService.getMethod("save", memberEntities);
-        final Object invoke = save.invoke(memberService.getDeclaredConstructor().newInstance(), memberObject);
 
 
 
@@ -63,5 +76,29 @@ public class MemberServiceTest {
 //        final Object invoke = plus.invoke(aClass.getDeclaredConstructor().newInstance(),2,2);
 //        log.info("Result : {}", invoke);
 
+    }
+
+    @Test
+    public void testScanClass(){
+        //customClassLoader.loadJar();
+        JarClassLoader jcl = new JarClassLoader();
+
+        //Loading classes from different sources
+        jcl.add("demo23.jar");
+
+        Map<String, byte[]> loadedResourceMap = jcl.getLoadedResources();
+
+
+        Set<String> loadedSet= loadedResourceMap.keySet().stream()
+                .filter(s -> s.startsWith("com/example/demo2/")).collect(Collectors.toSet());
+
+        //System.out.println(loadedSet.size());
+
+        for (String localSet : loadedSet) {
+
+            String modifiedString = localSet.replace("/", ".").replace(".class", "");
+            log.info("modified string " + modifiedString);
+
+        }
     }
 }
