@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.xeustechnologies.jcl.JarClassLoader;
 import org.xeustechnologies.jcl.JclObjectFactory;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -26,6 +27,8 @@ public class CalculatorTest {
 
     @Test
     public void testCall() throws ClassNotFoundException {
+        customClassLoader.loadJar();
+
         JarClassLoader jcl = new JarClassLoader();
 
         //Loading classes from different sources
@@ -45,8 +48,11 @@ public class CalculatorTest {
     }
 
     @Test
-    public void testInvokeMethod() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public void testInvokeMethodPlus() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, InstantiationException {
+        customClassLoader.loadJar();
+
         JarClassLoader jcl = new JarClassLoader();
+
         //Loading classes from different sources
         jcl.add("demo2.jar");
 
@@ -55,8 +61,10 @@ public class CalculatorTest {
         //Create object of loaded class
         Object obj = factory.create(jcl, "com.example.demo2.Calculator");
 
-        Method plus = obj.getClass().getMethod("plus", int.class, int.class);
+        Class<?> aClass = obj.getClass();
 
-
+        final Method plus = aClass.getMethod("plus", int.class, int.class);
+        final Object invoke = plus.invoke(aClass.getDeclaredConstructor().newInstance(),2,2);
+        log.info("Result : {}", invoke);
     }
 }
