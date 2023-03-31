@@ -33,7 +33,7 @@ public class MemberServiceTest {
         JarClassLoader jcl = new JarClassLoader();
 
         //Loading classes from different sources
-        jcl.add("demo2.jar");
+        jcl.add("demo23.jar");
 
         JclObjectFactory factory = JclObjectFactory.getInstance();
 
@@ -46,14 +46,22 @@ public class MemberServiceTest {
 
         final Object memberObject = memberEntities.getDeclaredConstructor().newInstance();
         final Field fName = memberEntities.getDeclaredField("name");
+        final Field fId = memberEntities.getDeclaredField("id");
         fName.setAccessible(true);
         fName.set(memberObject,"Harun");
+        fId.setAccessible(true);
+        fId.set(memberObject,"12121212");
 
 
+        Method[] declaredMethods = memberService.getDeclaredMethods();
+        for (Method method: declaredMethods){
+            System.out.println(method.getName());
+        }
 
 
-        final Method save = memberService.getMethod("save", memberEntities);
-        final Object invoke = save.invoke(memberService.getDeclaredConstructor().newInstance(), memberObject);
+        Method save = memberService.getMethod("save");
+        final Object result = save.invoke(memberService.getDeclaredConstructor().newInstance());
+        System.out.println(result);
 
 
 

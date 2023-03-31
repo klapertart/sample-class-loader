@@ -27,7 +27,7 @@ public class CalculatorTest {
 
     @Test
     public void testCall() throws ClassNotFoundException {
-        customClassLoader.loadJar();
+        //customClassLoader.loadJar();
 
         JarClassLoader jcl = new JarClassLoader();
 
