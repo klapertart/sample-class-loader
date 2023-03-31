@@ -1,62 +1,52 @@
 package com.example.demo3;
 
+import com.example.demo3.utils.CommonUtil;
+import com.example.demo3.utils.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 import org.xeustechnologies.jcl.JarClassLoader;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
- * @author TRITRONIK-PC_10040
+ * @author kurakuraninja
  * @since 30/03/2023
  */
 
 @Component
 public class CustomClassLoader {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
-    ConfigurableApplicationContext applicationContext;
+    private CommonUtil commonUtil;
+
+    @Value("${jar.path}")
+    private String jarPath;
+
+    @Value("${package.name}")
+    private String packageName;
 
     public void loadJar() throws ClassNotFoundException {
         JarClassLoader jcl = new JarClassLoader();
 
-        jcl.add("/Users/kurakuraninja/Downloads/tesjar/");  //loaded all the jars from test folder
+        //loaded all the jars from a directory
+        jcl.add(jarPath);
 
         Map<String, byte[]> loadedResourceMap = jcl.getLoadedResources();
 
-
         Set<String> loadedSet= loadedResourceMap.keySet().stream()
-                .filter(s -> s.startsWith("com/example/demo2/")).collect(Collectors.toSet());
+                .filter(s -> s.startsWith(packageName)).collect(Collectors.toSet());
 
-        //System.out.println(loadedSet.size());
+        commonUtil.registerAllClasses(jcl,loadedSet);
 
-        for (String localSet : loadedSet) {
-
-            String modifiedString = localSet.replace("/", ".").replace(".class", "");
-            //logger.info("modified string " + modifiedString);
-
-            final Class<?> loadedClass = jcl.loadClass(modifiedString);
-
-            try {
-                Object loadedObject =  applicationContext.getAutowireCapableBeanFactory()
-                        .createBean(loadedClass); //autowiring the loaded classes
-
-            } catch (Exception e) {
-                logger.info("Exception occured while loading " + modifiedString
-                        + " exception is" + e.getMessage());
-            }
-        }
-
+        commonUtil.displayAllBeans();
     }
 
 }
